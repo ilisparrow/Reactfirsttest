@@ -13,7 +13,8 @@ function createData(name, price) {
   return { name, price };
 }
 
-const rows = [createData("USD", 0), createData("EUR", 0), createData("JPY", 0)];
+const rows=[]
+
 const currencies = [
   { label: "Bitcoin", value: "BTC" },
   { label: "Etherum", value: "ETH" },
@@ -65,18 +66,31 @@ export default class getData extends React.Component {
   //  "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,JPY,EUR";
 
   async fetch() {
-    const url =
+    /*const url =
       "https://min-api.cryptocompare.com/data/price?fsym=" +
       this.state.choosenCurrency +
-      "&tsyms=USD,JPY,EUR";
+      "&tsyms=USD,JPY,EUR";*/
+    const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id=M000002"
 
     const res = await fetch(url);
     const data = await res.json();
     this.setState({ statedata: data, loading: false, rendered: true });
 
 
-    console.log(data.USD);
-//    console.log(data);
+    //console.log(data.USD);
+    for(var i =0;i<data.attributes.length;i++){
+      rows[i] = {"id":String(i),
+                "key":data.attributes[i].Key,
+                "no":data.attributes[i].No,
+                "an":data.attributes[i].AttributeName,
+                "av":data.attributes[i].AttributeValue,
+                "unit":data.attributes[i].UnitOfMeasure}
+
+    }
+    //const rows = [createData("USD", 0), createData("EUR", 0), createData("JPY", 0)];
+    //console.log(data.attributes.length)
+    //onsole.log(rows[0])
+    //console.log(data.attributes[0].Key);
   }
   aa = SimpleTable();
   render() {
@@ -84,11 +98,11 @@ export default class getData extends React.Component {
     //console.log(this.state.rendered);
     this.fetch();
     //} else {
-    if (this.state.statedata) {
-      rows[0].price = this.state.statedata.USD;
-      rows[1].price = this.state.statedata.EUR;
-      rows[2].price = this.state.statedata.JPY;
-    }
+    //if (this.state.statedata) {
+      //rows[0].price = this.state.statedata.USD;
+      //rows[1].price = this.state.statedata.EUR;
+      //rows[2].price = this.state.statedata.JPY;
+    //}
     //}
 
     return (
@@ -108,17 +122,23 @@ export default class getData extends React.Component {
                 <Table aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>name</TableCell>
-                      <TableCell align="right">Price</TableCell>
+                      <TableCell>ID</TableCell>
+                      <TableCell >Key</TableCell>
+                      <TableCell >No</TableCell>
+                      <TableCell >Attribute Name</TableCell>
+                      <TableCell >Attribute Value</TableCell>
+                      <TableCell align="right">Unit</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rows.map(row => (
-                      <TableRow key={row.name}>
-                        <TableCell component="th" scope="row">
-                          {row.name}
-                        </TableCell>
-                        <TableCell align="right">{row.price}</TableCell>
+                      <TableRow key={row.id}>
+                        <TableCell component="th" scope="row">{row.id}</TableCell>
+                        <TableCell component="th" scope="row">{row.key} </TableCell>
+                        <TableCell component="th" scope="row">{row.no} </TableCell>
+                        <TableCell component="th" scope="row">{row.an}</TableCell>
+                        <TableCell component="th" scope="row">{row.av}</TableCell>
+                        <TableCell align="right">{row.unit}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
