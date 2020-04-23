@@ -110,7 +110,7 @@ async fetch(){
 
       {this.state.statedata.map(row => (
         <List>
-        <ListItem button onClick={() => {if(this.state.open[row.key].open){this.state.open[row.key]={open:false};}else{this.state.open[row.key]={open:true};}this.forceUpdate();console.log(this.state.open[row.key]);}}>
+        <ListItem button onClick={() => {this.state.open[row.key]={open:!this.state.open[row.key].open};this.forceUpdate();console.log(this.state.open[row.key]);}}>
 
           <ListItemText primary={row.desc}  />
         {this.state.open[row.key]? <ExpandLess /> : <ExpandMore />}
