@@ -66,19 +66,20 @@ export default class getData extends React.Component {
   //  "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,JPY,EUR";
 
   async fetch() {
-    /*const url =
+    const url =
       "https://min-api.cryptocompare.com/data/price?fsym=" +
       this.state.choosenCurrency +
-      "&tsyms=USD,JPY,EUR";*/
-    const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id=M000002"
+      "&tsyms=USD,JPY,EUR";
+    //const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id=M000002"
 
     const res = await fetch(url);
     const data = await res.json();
+    console.log(data)
     this.setState({ statedata: data, loading: false, rendered: true });
 
 
     //console.log(data.USD);
-    for(var i =0;i<data.attributes.length;i++){
+    /*for(var i =0;i<data.attributes.length;i++){
       rows[i] = {"id":String(i),
                 "key":data.attributes[i].Key,
                 "no":data.attributes[i].No,
@@ -86,8 +87,8 @@ export default class getData extends React.Component {
                 "av":data.attributes[i].AttributeValue,
                 "unit":data.attributes[i].UnitOfMeasure}
 
-    }
-    //const rows = [createData("USD", 0), createData("EUR", 0), createData("JPY", 0)];
+    }*/
+    const rows = [createData("USD", 0), createData("EUR", 0), createData("JPY", 0)];
     //console.log(data.attributes.length)
     //onsole.log(rows[0])
     //console.log(data.attributes[0].Key);
@@ -98,11 +99,11 @@ export default class getData extends React.Component {
     //console.log(this.state.rendered);
     this.fetch();
     //} else {
-    //if (this.state.statedata) {
+    if (this.state.statedata) {
       //rows[0].price = this.state.statedata.USD;
       //rows[1].price = this.state.statedata.EUR;
       //rows[2].price = this.state.statedata.JPY;
-    //}
+    }
     //}
 
     return (
