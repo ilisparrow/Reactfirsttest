@@ -17,6 +17,7 @@ const rows = [
   { name: "Second item", cont: "D" },
   { name: "Third item", cont: "F" }
 ];
+/*
 const useStyles = makeStyles(theme => ({
   root: {
     width: "100%",
@@ -27,20 +28,21 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(4)
   }
 }));
+*/
 
 
 
+//const classes = useStyles();
 
 
-class Test extends React.Component  {
- state = {
+
+export default class NestedList extends React.Component{
+state = {
     loading: true,
     statedata: null,
     rendered: false,
-    choosenCurrency: "BTC"
-  }
-
-
+    openBtn1 : true
+  };
 
 async fetch(){
     //const url =
@@ -58,7 +60,8 @@ async fetch(){
 
 
     }
-    this.state.loading=false
+    this.setState({ statedata: rows, loading: false, rendered: true });
+
     return(rows)
 
     /*
@@ -77,41 +80,29 @@ async fetch(){
     //console.log(data.attributes[0].Key);
   }
 
-}
 
 
 
-function useForceUpdate(){
-    
-}
+  render(){
 
-
-export default function NestedList() {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-
-  const forceUpdate = useForceUpdate();
 
   const handleClick = () => {
-    setOpen(!open);
+    this.setState({openBtn1:!this.state.openBtn1});
   };
-  var a = new Test()
-  const [statedata,setStatedata]=useState(a.fetch())
-  
-  console.log(a.state.loading)
-  return (
-  <div>{a.state.loading ? (<div>No data availible</div>):
-      (<div>
 
+  this.fetch() 
+
+  return (
+  <div>{this.state.loading ? (<div>No data availible</div>):
+      (<div>
+  <div>{console.log(this.state.statedata)}</div>
 <List
       component="nav"
       aria-labelledby="nested-list-subheader"
       subheader={
         <ListSubheader component="div" id="nested-list-subheader">
-          Nested List Items
         </ListSubheader>
       }
-      className={classes.root}
     >
       <ListItem button>
         <ListItemIcon>
@@ -119,9 +110,9 @@ export default function NestedList() {
         </ListItemIcon>
         <ListItemText primary="Sent mail" />
       </ListItem>
-      {statedata.map(row => (
+      {this.state.statedata.map(row => (
         <ListItem button>
-          <ListItemText primary={row.name} />
+          <ListItemText primary={row.desc}  />
         </ListItem>
       ))}
       <ListItem button onClick={handleClick}>
@@ -129,11 +120,11 @@ export default function NestedList() {
           <InboxIcon />
         </ListItemIcon>
         <ListItemText primary="Inbox" />
-        {open ? <ExpandLess /> : <ExpandMore />}
+        {this.state.openBtn1 ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse in={this.state.openBtn1} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItem button className={classes.nested}>
+          <ListItem button > 
             <ListItemIcon>
               <StarBorder />
             </ListItemIcon>
@@ -149,6 +140,6 @@ export default function NestedList() {
     
 
     </div>
-  );
+  );}
 }
 
