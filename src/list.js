@@ -13,6 +13,7 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import StarBorder from "@material-ui/icons/StarBorder";
 
 const bopen =[]
+const _items = []
 const rows = [
   { name: "First item", cont: "B" },
   { name: "Second item", cont: "D" },
@@ -42,7 +43,8 @@ state = {
     loading: true,
     statedata: null,
     rendered: false,
-    openBtn : true
+    openBtn : true,
+    items : null
   };
 
 async fetch(){
@@ -58,13 +60,15 @@ async fetch(){
 
     for(var i =0;i<data.categories.length;i++){
       rows[i] = {key : i, desc:data.categories[i].Description}
+      _items[i] = {items:data.categories[i].items}
       if (this.state.loading){
         bopen[i] = {open:false}
       }
 
     }
-    this.setState({ statedata: rows, loading: false, rendered: true,open:bopen });
-
+    this.setState({ statedata: rows, loading: false, rendered: true,open:bopen,items:_items });
+    //console.log(this.state.items[0])
+    
     return
 
     /*
@@ -110,7 +114,7 @@ async fetch(){
 
       {this.state.statedata.map(row => (
         <List>
-        <ListItem button onClick={() => {this.state.open[row.key]={open:!this.state.open[row.key].open};this.forceUpdate();console.log(this.state.open[row.key]);}}>
+        <ListItem button onClick={() => {this.state.open[row.key]={open:!this.state.open[row.key].open};this.forceUpdate();}}>
 
           <ListItemText primary={row.desc}  />
         {this.state.open[row.key]? <ExpandLess /> : <ExpandMore />}
@@ -119,9 +123,11 @@ async fetch(){
         <Collapse in={this.state.open[row.key].open} timeout="auto" unmountOnExit>
         {/*console.log(this.state.open[row.key])*/}
           <List component="div" disablePadding>
-            <ListItem button > 
-              <ListItemText primary="Example" />
-            </ListItem>
+              {this.state.items[row.key].items.map(__item => (
+                <ListItem button > 
+                  <ListItemText primary={__item.ID} />
+                </ListItem>
+              ))}
           </List>
         </Collapse>
         </List>
