@@ -12,6 +12,7 @@ import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import StarBorder from "@material-ui/icons/StarBorder";
 
+const bopen =[]
 const rows = [
   { name: "First item", cont: "B" },
   { name: "Second item", cont: "D" },
@@ -41,7 +42,7 @@ state = {
     loading: true,
     statedata: null,
     rendered: false,
-    openBtn1 : true
+    openBtn : true
   };
 
 async fetch(){
@@ -56,13 +57,15 @@ async fetch(){
     //console.log(data.categories[0].Code);
 
     for(var i =0;i<data.categories.length;i++){
-      rows[i] = {desc:data.categories[i].Description}
-
+      rows[i] = {id : i, desc:data.categories[i].Description}
+      if (this.state.loading){
+        bopen[i] = {open:false}
+      }
 
     }
-    this.setState({ statedata: rows, loading: false, rendered: true });
+    this.setState({ statedata: rows, loading: false, rendered: true,open:bopen });
 
-    return(rows)
+    return
 
     /*
     for(var i =0;i<data.attributes.length;i++){
@@ -86,16 +89,17 @@ async fetch(){
   render(){
 
 
-  const handleClick = () => {
+  const handleClick = param => {
+  
     this.setState({openBtn1:!this.state.openBtn1});
   };
 
   this.fetch() 
 
+  console.log(this.state.open)
   return (
   <div>{this.state.loading ? (<div>No data availible</div>):
       (<div>
-  <div>{console.log(this.state.statedata)}</div>
 <List
       component="nav"
       aria-labelledby="nested-list-subheader"
@@ -104,18 +108,13 @@ async fetch(){
         </ListSubheader>
       }
     >
-      <ListItem button>
-        <ListItemIcon>
-          <SendIcon />
-        </ListItemIcon>
-        <ListItemText primary="Sent mail" />
-      </ListItem>
+
       {this.state.statedata.map(row => (
-        <ListItem button>
+        <ListItem button onClick={() => this.state.open[row.id]=!this.state.open[row.id]}>
           <ListItemText primary={row.desc}  />
         </ListItem>
       ))}
-      <ListItem button onClick={handleClick}>
+      <ListItem button onClick={handleClick.bind("test")}>
         <ListItemIcon>
           <InboxIcon />
         </ListItemIcon>
