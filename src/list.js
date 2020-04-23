@@ -57,7 +57,7 @@ async fetch(){
     //console.log(data.categories[0].Code);
 
     for(var i =0;i<data.categories.length;i++){
-      rows[i] = {id : i, desc:data.categories[i].Description}
+      rows[i] = {key : i, desc:data.categories[i].Description}
       if (this.state.loading){
         bopen[i] = {open:false}
       }
@@ -96,7 +96,6 @@ async fetch(){
 
   this.fetch() 
 
-  console.log(this.state.open)
   return (
   <div>{this.state.loading ? (<div>No data availible</div>):
       (<div>
@@ -110,28 +109,37 @@ async fetch(){
     >
 
       {this.state.statedata.map(row => (
-        <ListItem button onClick={() => this.state.open[row.id]=!this.state.open[row.id]}>
+        <List>
+        <ListItem button onClick={() => {if(this.state.open[row.key].open){this.state.open[row.key]={open:false};}else{this.state.open[row.key]={open:true};}this.forceUpdate();console.log(this.state.open[row.key]);}}>
+
           <ListItemText primary={row.desc}  />
+        {this.state.open[row.key]? <ExpandLess /> : <ExpandMore />}
         </ListItem>
+
+        <Collapse in={this.state.open[row.key].open} timeout="auto" unmountOnExit>
+        {/*console.log(this.state.open[row.key])*/}
+          <List component="div" disablePadding>
+            <ListItem button > 
+              <ListItemText primary="Example" />
+            </ListItem>
+          </List>
+        </Collapse>
+        </List>
       ))}
+      
       <ListItem button onClick={handleClick.bind("test")}>
-        <ListItemIcon>
-          <InboxIcon />
-        </ListItemIcon>
         <ListItemText primary="Inbox" />
         {this.state.openBtn1 ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={this.state.openBtn1} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <ListItem button > 
-            <ListItemIcon>
-              <StarBorder />
-            </ListItemIcon>
             <ListItemText primary="Starred" />
           </ListItem>
         </List>
       </Collapse>
     </List>
+    
 
       </div>)}
 
