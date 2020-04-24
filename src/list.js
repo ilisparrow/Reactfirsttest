@@ -11,6 +11,16 @@ import SendIcon from "@material-ui/icons/Send";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import StarBorder from "@material-ui/icons/StarBorder";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Link,
+  Redirect
+} from "react-router-dom";
+import itemPage from "./itemPage";
+import { isConstructorDeclaration } from "typescript";
+
 
 const bopen =[]
 const _items = []
@@ -34,7 +44,6 @@ const useStyles = makeStyles(theme => ({
 
 
 
-//const classes = useStyles();
 
 
 
@@ -44,7 +53,10 @@ state = {
     statedata: null,
     rendered: false,
     openBtn : true,
-    items : null
+    loadingItems : true,
+    items : null,
+    noItem:"M025084",
+    Index : true
   };
 
 async fetch(){
@@ -58,10 +70,10 @@ async fetch(){
     //console.log(data)
     //console.log(data.categories[0].Code);
 
-    for(var i =0;i<data.categories.length;i++){
-      rows[i] = {key : i, desc:data.categories[i].Description}
-      _items[i] = {items:data.categories[i].items}
-      if (this.state.loading){
+    if (this.state.loading){
+      for(var i =0;i<data.categories.length;i++){
+        rows[i] = {key : i, desc:data.categories[i].Description}
+        _items[i] = {items:data.categories[i].items}
         bopen[i] = {open:false}
       }
 
@@ -71,37 +83,64 @@ async fetch(){
     
     return
 
-    /*
-    for(var i =0;i<data.attributes.length;i++){
-      rows[i] = {"id":String(i),
-                "key":data.attributes[i].Key,
-                "no":data.attributes[i].No,
-                "an":data.attributes[i].AttributeName,
-                "av":data.attributes[i].AttributeValue,
-                "unit":data.attributes[i].UnitOfMeasure}
-
-    }*/
-    //const rows = [createData("USD", 0), createData("EUR", 0), createData("JPY", 0)];
-    //console.log(data.attributes.length)
-    //onsole.log(rows[0])
-    //console.log(data.attributes[0].Key);
+ 
   }
+  
 
+
+  async fetchItem(){
+    const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id="+this.state.noItem
+    const res = await fetch(url);
+    const data = await res.json();
+//const urlpdf ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+
+    //console.log(data);
+    for(var i =0;i<data.data.length;i++){
+      rows[i] = {"key":data.data[i].Key,
+                "no":data.data[i].No,
+                "an":data.data[i].AttributeName,
+                "av":data.data[i].AttributeValue,
+                "unit":data.data[i].UnitOfMeasure}
+
+    }
+    this.setState({ statedata: rows, loadingItems: false});
+    //console.log(this.state.statedata[0])
+    
+    return
+
+ 
+  }
 
 
 
   render(){
 
+    if(this.state.Index){
 
   const handleClick = param => {
   
     this.setState({openBtn1:!this.state.openBtn1});
   };
 
+  const subItemClick = param => {
+    this.setState({Index:false});
+    //this.setState({:false});
+      console.log("clicked")
+       //return( <Router><Redirect to="/items"></Redirect>  </Router>)
+  console.log("subButtonClicled")
+  };
   this.fetch() 
 
   return (
-  <div>{this.state.loading ? (<div>No data availible</div>):
+  <div>
+    <Router>
+       {/*All our Routes goes here!*/}
+       <Route exact path="/" component={"NestedList"} />
+      <Route exact path="/items" component={itemPage} />
+      </Router> 
+    
+    
+    {this.state.loading ? (<div>No data availible</div>):
       (<div>
 <List
       component="nav"
@@ -117,14 +156,14 @@ async fetch(){
         <ListItem button onClick={() => {this.state.open[row.key]={open:!this.state.open[row.key].open};this.forceUpdate();}}>
 
           <ListItemText primary={row.desc}  />
-        {this.state.open[row.key]? <ExpandLess /> : <ExpandMore />}
+        {this.state.open[row.key].open? <ExpandLess /> : <ExpandMore />}
         </ListItem>
 
         <Collapse in={this.state.open[row.key].open} timeout="auto" unmountOnExit>
         {/*console.log(this.state.open[row.key])*/}
           <List component="div" disablePadding>
               {this.state.items[row.key].items.map(__item => (
-                <ListItem button > 
+                <ListItem button onClick={() => {this.setState({Index:false});this.setState({noItem:__item.ID})}}> 
                   <ListItemText primary={__item.ID} />
                 </ListItem>
               ))}
@@ -153,6 +192,24 @@ async fetch(){
     
 
     </div>
-  );}
+  );
+              }//If bracket
+
+    else{
+      this.fetchItem();
+/*
+Key	""
+No	"M025084"
+AttributeName	"Aussendurchmesser"
+AttributeValue	"125"
+UnitOfMeasure	"mm"
+*/
+    return(<div>
+      <button onClick={() => {this.setState({Index:true});this.setState({loading:true});}}>Index</button>  
+      {!this.state.loadingItems?(<div><h2>{this.state.noItem}</h2>{this.state.statedata.map(row => (<li><h4>{row.an} :</h4><div>Attribute Value : {row.av}<div>Unit : {row.unit}</div></div></li>))}</div>):(<div>Loading</div>)} </div>)
+
+  }
+
+}
 }
 
