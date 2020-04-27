@@ -48,7 +48,8 @@ state = {
   };
 
 async fetch(){
-    const url ="http://localhost:8080/api/core/ibo.base.categories"
+
+    const url ="https://product.ibo-tec.de/api/core/ibo.base.categories"
 
     const res = await fetch(url);
     const data = await res.json();
@@ -72,7 +73,7 @@ async fetch(){
 
 
   async fetchItem(){
-    const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id="+this.state.noItem
+    const url ="https://product.ibo-tec.de/api/core/ibo.base.item.attributes?id="+this.state.noItem
     const res = await fetch(url);
     const data = await res.json();
     
@@ -87,16 +88,31 @@ async fetch(){
 
     }
 
-    //********************************************************************************** */
-//TODO : Change the item ID by a dynamic one
-    //********************************************************************************** */
-    const urlpdf ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
-    const resultfile = await fetch(urlpdf);
-    this.setState({ pdflink : resultfile.url});
+     try
+    {
+    //const urlpdf ="https://product.ibo-tec.de/api/core/ibo.base.item.document?id="+this.state.noItem+"&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+      const urlpdf ="https://product.ibo-tec.de/api/core/ibo.base.item.document?id=M026218&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+      const resultfile = await fetch(urlpdf);
+      this.setState({ pdflink : resultfile.url});
+    }
+    catch(err) 
+    {
+      console.log("Error Getting the pdf file") 
+    }
 
-    const urlcad ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=1"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
-    const resultcad = await fetch(urlcad);
-    this.setState({ cadlink : resultcad.url});
+
+    try
+    {
+    //const urlcad ="https://product.ibo-tec.de/api/core/ibo.base.item.document?id="+this.state.noItem+"&type=1"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+      const urlcad ="https://product.ibo-tec.de/api/core/ibo.base.item.document?id=M026218&type=1"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+      const resultcad = await fetch(urlcad);
+      this.setState({ cadlink : resultcad.url});
+    }
+    
+    catch(err) 
+    {
+      console.log("Error Getting the CAD file") 
+    }
 
     this.setState({ statedata: rows, loadingItems: false});
 
@@ -108,13 +124,12 @@ async fetch(){
 
   render(){
 
-    if(this.state.Index){
+  if(this.state.Index){
 
-  const handleClick = param => {
-  
-    this.setState({openBtn1:!this.state.openBtn1});
-  };
-
+    if(this.state.loading)
+    {
+      this.fetch() 
+    }
   const subItemClick = param => {
     this.setState({Index:false});
     //this.setState({:false});
@@ -122,13 +137,12 @@ async fetch(){
        //return( <Router><Redirect to="/items"></Redirect>  </Router>)
   console.log("subButtonClicled")
   };
-  this.fetch() 
 
   return (
   <div>
     
     
-    {this.state.loading ? (<div>No data availible</div>):
+    {this.state.loading ? (<div>Loading...</div>):
       (<div>
 <List
       component="nav"
@@ -160,17 +174,7 @@ async fetch(){
         </List>
       ))}
       
-      <ListItem button onClick={handleClick.bind("test")}>
-        <ListItemText primary="Inbox" />
-        {this.state.openBtn1 ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={this.state.openBtn1} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItem button > 
-            <ListItemText primary="Starred" />
-          </ListItem>
-        </List>
-      </Collapse>
+
     </List>
     
 
@@ -184,7 +188,9 @@ async fetch(){
               }//If bracket
 
     else{
-      this.fetchItem();
+      if(this.state.loadingItems){
+        this.fetchItem();
+      }
 /*
 Key	""
 No	"M025084"
@@ -194,7 +200,7 @@ UnitOfMeasure	"mm"
 */
     return(<div>
       <button onClick={() => {this.setState({Index:true});this.setState({loading:true});}}>Index</button>  
-      {!this.state.loadingItems?(<div><h2>{this.state.noItem}</h2><p>Download pdf if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.pdflink} download>Click to download</a></p><p>Download cad if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.cadlink} download>Click to download</a></p>{this.state.statedata.map(row => (<li><h4>{row.an} :</h4><div>Attribute Value : {row.av}<div>Unit : {row.unit}</div></div></li>))}</div>):(<div>Loading</div>)} </div>)
+      {!this.state.loadingItems?(<div><h2>{this.state.noItem}</h2><p>Download pdf if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.pdflink} download>Click to download</a></p><p>Download cad if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.cadlink} download>Click to download</a></p>{this.state.statedata.map(row => (<li><h4>{row.an} :</h4><div>Attribute Value : {row.av}<div>Unit : {row.unit}</div></div></li>))}</div>):(<div>Loading...</div>)} </div>)
 
   }
 
