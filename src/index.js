@@ -6,12 +6,12 @@ import List from "./list";
 
 
 
-const test = false ;
+const list = true ;
 
 
 
 
-if(test){
+if(!list){
 
 ReactDOM.render(<Demo />, document.querySelector("#root"));
 }

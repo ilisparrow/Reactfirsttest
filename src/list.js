@@ -18,7 +18,6 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
-import itemPage from "./itemPage";
 import { isConstructorDeclaration } from "typescript";
 
 
@@ -29,19 +28,6 @@ const rows = [
   { name: "Second item", cont: "D" },
   { name: "Third item", cont: "F" }
 ];
-/*
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper
-  },
-  nested: {
-    paddingLeft: theme.spacing(4)
-  }
-}));
-*/
-
 
 
 
@@ -56,19 +42,17 @@ state = {
     loadingItems : true,
     items : null,
     noItem:"M025084",
+    pdflink:'',
+    cadlink:'',
     Index : true
   };
 
 async fetch(){
-    //const url =
-    //  "https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=USD,JPY,EUR";
     const url ="http://localhost:8080/api/core/ibo.base.categories"
 
     const res = await fetch(url);
     const data = await res.json();
 
-    //console.log(data)
-    //console.log(data.categories[0].Code);
 
     if (this.state.loading){
       for(var i =0;i<data.categories.length;i++){
@@ -79,7 +63,6 @@ async fetch(){
 
     }
     this.setState({ statedata: rows, loading: false, rendered: true,open:bopen,items:_items });
-    //console.log(this.state.items[0])
     
     return
 
@@ -92,7 +75,7 @@ async fetch(){
     const url ="http://localhost:8080/api/core/ibo.base.item.attributes?id="+this.state.noItem
     const res = await fetch(url);
     const data = await res.json();
-//const urlpdf ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+    
 
     //console.log(data);
     for(var i =0;i<data.data.length;i++){
@@ -103,15 +86,25 @@ async fetch(){
                 "unit":data.data[i].UnitOfMeasure}
 
     }
+
+    //********************************************************************************** */
+//TODO : Change the item ID by a dynamic one
+    //********************************************************************************** */
+    const urlpdf ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=2"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+    const resultfile = await fetch(urlpdf);
+    this.setState({ pdflink : resultfile.url});
+
+    const urlcad ="http://localhost:8080/api/core/ibo.base.item.document?id=M026218&type=1"//Api Call for pdfs, or CAD models, type 2 for PDF and 1 for CAD
+    const resultcad = await fetch(urlcad);
+    this.setState({ cadlink : resultcad.url});
+
     this.setState({ statedata: rows, loadingItems: false});
-    //console.log(this.state.statedata[0])
+
     
     return
 
  
   }
-
-
 
   render(){
 
@@ -133,11 +126,6 @@ async fetch(){
 
   return (
   <div>
-    <Router>
-       {/*All our Routes goes here!*/}
-       <Route exact path="/" component={"NestedList"} />
-      <Route exact path="/items" component={itemPage} />
-      </Router> 
     
     
     {this.state.loading ? (<div>No data availible</div>):
@@ -206,7 +194,7 @@ UnitOfMeasure	"mm"
 */
     return(<div>
       <button onClick={() => {this.setState({Index:true});this.setState({loading:true});}}>Index</button>  
-      {!this.state.loadingItems?(<div><h2>{this.state.noItem}</h2>{this.state.statedata.map(row => (<li><h4>{row.an} :</h4><div>Attribute Value : {row.av}<div>Unit : {row.unit}</div></div></li>))}</div>):(<div>Loading</div>)} </div>)
+      {!this.state.loadingItems?(<div><h2>{this.state.noItem}</h2><p>Download pdf if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.pdflink} download>Click to download</a></p><p>Download cad if availible :   <a target="_blank" rel="noopener noreferrer" href={this.state.cadlink} download>Click to download</a></p>{this.state.statedata.map(row => (<li><h4>{row.an} :</h4><div>Attribute Value : {row.av}<div>Unit : {row.unit}</div></div></li>))}</div>):(<div>Loading</div>)} </div>)
 
   }
 
